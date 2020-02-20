@@ -112,6 +112,41 @@ def solve_case_d(books_count, days, book_scores_dict, libraries):
         first = False
     return selected_libraries
 
+def solve_case_e(books_count, days, book_scores_dict, libraries):
+    days_remaining = days
+    already_scanned_books_set = set()
+    output_libraries = list()
+    total_score = 0
+    while True:
+        print("Remaining days: {}".format(days_remaining))
+        for library in libraries:
+            max_value, scanned_books_list = find_library_value_and_books(library, days_remaining, already_scanned_books_set, book_scores_dict, True)
+            library.max_value = max_value
+            library.scanned_books_list = scanned_books_list
+            library.magic_ratio = max_value / library.signup_days
+
+        sorted_libraries = sorted(libraries, key=lambda x: x.magic_ratio, reverse=True)
+
+        # we have chosen a winner, update the values
+        winner_library = sorted_libraries.pop(0)
+        if winner_library.max_value == 0:
+            print('Got max_value 0')
+            # we can't scan anything anymore, bail
+            break
+        total_score += winner_library.max_value
+        days_remaining -= winner_library.signup_days
+        winner_library_books_set = set(winner_library.scanned_books_list)
+        already_scanned_books_set = already_scanned_books_set.union(winner_library_books_set)
+        output_libraries.append(winner_library)
+        libraries = sorted_libraries
+        if not libraries:
+            print('Run out of libraries')
+            break
+
+    print("Total libraries: {}".format(len(output_libraries)))
+    print("Total score: {}".format(total_score))
+
+    return output_libraries
 
 def run_generic_algorithm(books_count, days, book_scores_dict, libraries):
     days_remaining = days
@@ -121,7 +156,7 @@ def run_generic_algorithm(books_count, days, book_scores_dict, libraries):
     while True:
         print("Remaining days: {}".format(days_remaining))
         for library in libraries:
-            max_value, scanned_books_list = find_library_value_and_books(library, days_remaining, already_scanned_books_set, book_scores_dict)
+            max_value, scanned_books_list = find_library_value_and_books(library, days_remaining, already_scanned_books_set, book_scores_dict, False)
             library.max_value = max_value
             library.scanned_books_list = scanned_books_list
             library.magic_ratio = max_value / library.signup_days
@@ -150,17 +185,17 @@ def run_generic_algorithm(books_count, days, book_scores_dict, libraries):
     return output_libraries
 
 
-def find_library_value_and_books(library, days_remaining, already_scanned_books_set, book_scores_dict):
+def find_library_value_and_books(library, days_remaining, already_scanned_books_set, book_scores_dict, select_only_great_books):
     days_available = days_remaining - library.signup_days
     if days_available <= 0:
         return 0, []
     books_not_scanned = library.books_index_set - already_scanned_books_set
     max_books_we_can_scan = days_available * library.ship_books_per_day
 
-    my_books_dict = dict()
-    for book_index in books_not_scanned:
-        if book_scores_dict[book_index] >= 150:
-            my_books_dict[book_index] = book_scores_dict[book_index]
+    if select_only_great_books:
+        my_books_dict = find_only_great_books(books_not_scanned, book_scores_dict)
+    else:
+        my_books_dict = find_best_books(books_not_scanned, book_scores_dict)
 
     books_added = 0
     library_value = 0
@@ -174,6 +209,18 @@ def find_library_value_and_books(library, days_remaining, already_scanned_books_
 
     return library_value, scanned_books_list
 
+def find_best_books (books_not_scanned, book_scores_dict):
+    books_dict = dict()
+    for book_index in books_not_scanned:
+        books_dict[book_index] = book_scores_dict[book_index]
+    return books_dict
+
+def find_only_great_books (books_not_scanned, book_scores_dict):
+    books_dict = dict()
+    for book_index in books_not_scanned:
+        if book_scores_dict[book_index] >= 150:
+            books_dict[book_index] = book_scores_dict[book_index]
+    return books_dict
 
 def main():
     myargs = parse_args()
@@ -191,6 +238,9 @@ def main():
     elif myargs.input.find('d_tough_choices.txt') != -1:
         print("Sample d hack")
         libraries_solved = solve_case_d(books_count, days, book_scores_dict, libraries)
+    elif myargs.input.find('e_so_many_books.txt') != -1:
+        print("Sample e hack")
+        libraries_solved = solve_case_e(books_count, days, book_scores_dict, libraries)
     else:
         print("Generic solution")
         libraries_solved = run_generic_algorithm(books_count, days, book_scores_dict, libraries)
