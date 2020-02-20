@@ -38,7 +38,7 @@ def read_input(myargs):
         for idx, book_score in enumerate(book_scores):
             book_scores_dict[idx] = int(book_score)
 
-        print('Book score dict: {}'.format(book_scores_dict))
+        # print('Book score dict: {}'.format(book_scores_dict))
 
         # a bit hacky, we define the library here to fill the data from its 2 lines
         libraries = list()
@@ -90,26 +90,35 @@ def run_generic_algorithm(books_count, days, book_scores_dict, libraries):
     days_remaining = days
     already_scanned_books_set = set()
     output_libraries = list()
+    total_score = 0
     while True:
+        print("Remaining days: {}".format(days_remaining))
         for library in libraries:
             max_value, scanned_books_list = find_library_value_and_books(library, days_remaining, already_scanned_books_set, book_scores_dict)
             library.max_value = max_value
             library.scanned_books_list = scanned_books_list
+            library.magic_ratio = max_value / library.signup_days
 
-        sorted_libraries = sorted(libraries, key=lambda x: x.max_value, reverse=True)
+        sorted_libraries = sorted(libraries, key=lambda x: x.magic_ratio, reverse=True)
 
         # we have chosen a winner, update the values
         winner_library = sorted_libraries.pop(0)
         if winner_library.max_value == 0:
+            print('Got max_value 0')
             # we can't scan anything anymore, bail
             break
-        days_remaining -= winner_library.ship_books_per_day
+        total_score += winner_library.max_value
+        days_remaining -= winner_library.signup_days
         winner_library_books_set = set(winner_library.scanned_books_list)
         already_scanned_books_set = already_scanned_books_set.union(winner_library_books_set)
         output_libraries.append(winner_library)
         libraries = sorted_libraries
         if not libraries:
+            print('Run out of libraries')
             break
+
+    print("Total libraries: {}".format(len(output_libraries)))
+    print("Total score: {}".format(total_score))
 
     return output_libraries
 
@@ -142,9 +151,10 @@ def main():
     myargs = parse_args()
     books_count, days, book_scores_dict, libraries = read_input(myargs)
     print('Books: {}, Days: {}'.format(books_count, days))
-    print('Book score dict: {}'.format(book_scores_dict))
+    # print('Book score dict: {}'.format(book_scores_dict))
     for library in libraries:
-        print('Book library: {}'.format(library.__dict__))
+        pass
+        # print('Book library: {}'.format(library.__dict__))
 
     # Task
     if myargs.input.find('b_read_on.txt') != -1:
