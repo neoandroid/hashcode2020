@@ -10,10 +10,13 @@ class Library(object):
     book_index_set = None
 
     def __init__(self, library_index, book_count, signup_days, ship_books_per_day):
-        self.library_index = library_index
-        self.book_count = book_count
-        self.signup_days = signup_days
-        self.ship_books_per_day = ship_books_per_day
+        self.library_index = int(library_index)
+        self.book_count = int(book_count)
+        self.signup_days = int(signup_days)
+        self.ship_books_per_day = int(ship_books_per_day)
+
+    def __repr__(self):
+        return "<Library: index:%s signup_delay:%s>" % (self.library_index, self.signup_days)
 
 
 def parse_args():
