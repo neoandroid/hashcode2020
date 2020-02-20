@@ -85,7 +85,7 @@ def solve_case_b(books_count, days, book_scores_dict, libraries):
         library.scanned_books_list = library.books_index_set
     for librari in sorted_libraries:
         print(library.scanned_books_list)
-    print_output('output_b.txt', sorted_libraries)
+    return sorted_libraries
 
 
 def main():
@@ -100,9 +100,11 @@ def main():
 
     # Task
     if myargs.input.find('b_read_on.txt') != -1:
-        solve_case_b(books_count, days, book_scores_dict, libraries)
+        libraries_solved = solve_case_b(books_count, days, book_scores_dict, libraries)
+    elif myargs.input.find('d_tough_choices.txt'):
+        libraries_solved = solve_case_b(books_count, days, book_scores_dict, libraries)
 
-    print_output('output.txt', libraries)
+    print_output('output.txt', libraries_solved)
 
 
 if __name__ == "__main__":
