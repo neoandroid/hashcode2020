@@ -24,9 +24,9 @@ def read_input(myargs):
 def main():
     myargs = parse_args()
     num_photos, photos = read_input(myargs)
-    print 'Number of photos: {}'.format(num_photos)
+    print('Number of photos: {}'.format(num_photos))
     for i in photos:
-        print i
+        print(i)
 
 
 
