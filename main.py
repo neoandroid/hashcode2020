@@ -83,8 +83,6 @@ def solve_case_b(books_count, days, book_scores_dict, libraries):
     for library in sorted_libraries:
         print(library.books_index_set)
         library.scanned_books_list = library.books_index_set
-    for librari in sorted_libraries:
-        print(library.scanned_books_list)
     return sorted_libraries
 
 
