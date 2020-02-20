@@ -58,7 +58,8 @@ def main():
     books_count, days, book_scores_dict, libraries = read_input(myargs)
     print('Books: {}, Days: {}'.format(books_count, days))
     print('Book score dict: {}'.format(book_scores_dict))
-    print('Book libraries: {}'.format(libraries))
+    for library in libraries:
+        print('Book library: {}'.format(library.__dict__))
 
 
 if __name__ == "__main__":
