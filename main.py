@@ -104,13 +104,14 @@ def run_generic_algorithm(books_count, days, book_scores_dict, libraries):
             # we can't scan anything anymore, bail
             break
         days_remaining -= winner_library.ship_books_per_day
-        already_scanned_books_set = already_scanned_books_set + set(winner_library.scanned_booked_list)
+        winner_library_books_set = set(winner_library.scanned_books_list)
+        already_scanned_books_set = already_scanned_books_set.union(winner_library_books_set)
         output_libraries.append(winner_library)
         libraries = sorted_libraries
         if not libraries:
             break
 
-    return libraries
+    return output_libraries
 
 
 def find_library_value_and_books(library, days_remaining, already_scanned_books_set, book_scores_dict):
