@@ -7,7 +7,7 @@ class Library(object):
     book_count = 0
     signup_days = 0
     ship_books_per_day = 0
-    book_index_set = None
+    books_index_set = None
 
     def __init__(self, library_index, book_count, signup_days, ship_books_per_day):
         self.library_index = int(library_index)
@@ -80,6 +80,12 @@ def solve_case_b(books_count, days, book_scores_dict, libraries):
     how_many_singups = 100
     sorted_libraries = sorted(libraries, key=lambda x: x.signup_days, reverse=False)
     print(sorted_libraries)
+    for library in sorted_libraries:
+        print(library.books_index_set)
+        library.scanned_books_list = library.books_index_set
+    for librari in sorted_libraries:
+        print(library.scanned_books_list)
+    print_output('output_b.txt', sorted_libraries)
 
 
 def main():
