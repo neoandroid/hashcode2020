@@ -31,11 +31,12 @@ def read_input(myargs):
         lines = f.readlines()
         header_line = lines[0]
         books_count, libraries, days = header_line.split()
+        days = int(days)
         print('Books: {}, Libraries: {}, Days: {}'.format(books_count, libraries, days))
         book_scores = lines[1].split()
         book_scores_dict = {}
         for idx, book_score in enumerate(book_scores):
-            book_scores_dict[idx] = book_score
+            book_scores_dict[idx] = int(book_score)
 
         print('Book score dict: {}'.format(book_scores_dict))
 
@@ -51,7 +52,7 @@ def read_input(myargs):
                 book_count, signup_days, ship_books_per_day = line.split()
                 library = Library(library_index, book_count, signup_days, ship_books_per_day)
             else:
-                books_index_set = set(line.split())
+                books_index_set = set(map(int, line.split()))
                 library.books_index_set = books_index_set
                 libraries.append(library)
 
@@ -77,26 +78,34 @@ def solve_case_b(books_count, days, book_scores_dict, libraries):
     # 100 librares, all ship 1 book
     # 1000 days
     print("Start")
-    how_many_singups = 100
     sorted_libraries = sorted(libraries, key=lambda x: x.signup_days, reverse=False)
     print(sorted_libraries)
     for library in sorted_libraries:
         print(library.books_index_set)
         library.scanned_books_list = library.books_index_set
-    for librari in sorted_libraries:
-        print(library.scanned_books_list)
     return sorted_libraries
 
 
 def run_generic_algorithm(books_count, days, book_scores_dict, libraries):
+    days_remaining = days
     already_scanned_books_set = set()
-    while(1):
+    output_libraries = list()
+    while True:
         for library in libraries:
-            max_value, scanned_books_list = find_library_value_and_books(library, days, book_scores_dict)
+            max_value, scanned_books_list = find_library_value_and_books(library, days_remaining, already_scanned_books_set, book_scores_dict)
             library.max_value = max_value
+            library.scanned_books_list = scanned_books_list
 
         sorted_libraries = sorted(libraries, key=lambda x: x.max_value, reverse=True)
+
+        # we have chosen a winner, update the values
         winner_library = sorted_libraries.pop(0)
+        if winner_library.max_value == 0:
+            # we can't scan anything anymore, bail
+            break
+        days_remaining -= winner_library.ship_books_per_day
+        already_scanned_books_set = already_scanned_books_set + set(winner_library.scanned_booked_list)
+        output_libraries.append(winner_library)
         libraries = sorted_libraries
         if not libraries:
             break
@@ -106,6 +115,8 @@ def run_generic_algorithm(books_count, days, book_scores_dict, libraries):
 
 def find_library_value_and_books(library, days_remaining, already_scanned_books_set, book_scores_dict):
     days_available = days_remaining - library.signup_days
+    if days_available <= 0:
+        return 0, []
     books_not_scanned = library.books_index_set - already_scanned_books_set
     max_books_we_can_scan = days_available * library.ship_books_per_day
 
@@ -131,16 +142,18 @@ def main():
     books_count, days, book_scores_dict, libraries = read_input(myargs)
     print('Books: {}, Days: {}'.format(books_count, days))
     print('Book score dict: {}'.format(book_scores_dict))
-    import pdb; pdb.set_trace()
     for library in libraries:
         print('Book library: {}'.format(library.__dict__))
 
     # Task
     if myargs.input.find('b_read_on.txt') != -1:
+        print("Sample b hack")
         libraries_solved = solve_case_b(books_count, days, book_scores_dict, libraries)
-    elif myargs.input.find('d_tough_choices.txt'):
+    elif myargs.input.find('d_tough_choices.txt') != -1:
+        print("Sample d hack")
         libraries_solved = solve_case_b(books_count, days, book_scores_dict, libraries)
     else:
+        print("Generic solution")
         libraries_solved = run_generic_algorithm(books_count, days, book_scores_dict, libraries)
         # run_fake_algorithm(libraries)
 
