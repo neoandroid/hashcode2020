@@ -40,7 +40,9 @@ def read_input(myargs):
         libraries = list()
         library = None
         for idx, line in enumerate(lines[2:]):
-            print(line)
+            # print("Line: {}".format(line))
+            if line == '\n':
+                continue
             library_index = idx / 2
             if idx % 2 == 0:
                 book_count, signup_days, ship_books_per_day = line.split()
