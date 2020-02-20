@@ -82,19 +82,58 @@ def solve_case_b(books_count, days, book_scores_dict, libraries):
     print(sorted_libraries)
 
 
+def run_generic_algorithm(books_count, days, book_scores_dict, libraries):
+    already_scanned_books_set = set()
+    while(1):
+        for library in libraries:
+            max_value, scanned_books_list = find_library_value_and_books(library, days, book_scores_dict)
+            library.max_value = max_value
+
+        sorted_libraries = sorted(libraries, key=lambda x: x.max_value, reverse=True)
+        winner_library = sorted_libraries.pop(0)
+        libraries = sorted_libraries
+        if not libraries:
+            break
+
+
+def find_library_value_and_books(library, days_remaining, already_scanned_books_set, book_scores_dict):
+    days_available = days_remaining - library.signup_days
+    books_not_scanned = library.books_index_set - already_scanned_books_set
+    max_books_we_can_scan = days_available * library.ship_books_per_day
+
+    my_books_dict = dict()
+    for book_index in books_not_scanned:
+        my_books_dict[book_index] = book_scores_dict[book_index]
+
+    books_added = 0
+    library_value = 0
+    scanned_books_list = list()
+    for k, v in sorted(my_books_dict.items(), key=lambda item: item[1]):
+        library_value += v
+        scanned_books_list.append(k)
+        books_added += 1
+        if books_added == max_books_we_can_scan:
+            break
+
+    return library_value, scanned_books_list
+
+
 def main():
     myargs = parse_args()
     books_count, days, book_scores_dict, libraries = read_input(myargs)
     print('Books: {}, Days: {}'.format(books_count, days))
     print('Book score dict: {}'.format(book_scores_dict))
+    import pdb; pdb.set_trace()
     for library in libraries:
         print('Book library: {}'.format(library.__dict__))
 
-    run_fake_algorithm(libraries)
 
     # Task
     if myargs.input.find('b_read_on.txt') != -1:
         solve_case_b(books_count, days, book_scores_dict, libraries)
+    else:
+        run_generic_algorithm(books_count, days, book_scores_dict, libraries)
+        run_fake_algorithm(libraries)
 
     print_output('output.txt', libraries)
 
