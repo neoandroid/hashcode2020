@@ -7,7 +7,7 @@ class Library(object):
     book_count = 0
     signup_days = 0
     ship_books_per_day = 0
-    book_index_set = None
+    books_index_set = None
 
     def __init__(self, library_index, book_count, signup_days, ship_books_per_day):
         self.library_index = int(library_index)
@@ -80,6 +80,12 @@ def solve_case_b(books_count, days, book_scores_dict, libraries):
     how_many_singups = 100
     sorted_libraries = sorted(libraries, key=lambda x: x.signup_days, reverse=False)
     print(sorted_libraries)
+    for library in sorted_libraries:
+        print(library.books_index_set)
+        library.scanned_books_list = library.books_index_set
+    for librari in sorted_libraries:
+        print(library.scanned_books_list)
+    return sorted_libraries
 
 
 def run_generic_algorithm(books_count, days, book_scores_dict, libraries):
@@ -94,6 +100,8 @@ def run_generic_algorithm(books_count, days, book_scores_dict, libraries):
         libraries = sorted_libraries
         if not libraries:
             break
+
+    return libraries
 
 
 def find_library_value_and_books(library, days_remaining, already_scanned_books_set, book_scores_dict):
@@ -127,15 +135,16 @@ def main():
     for library in libraries:
         print('Book library: {}'.format(library.__dict__))
 
-
     # Task
     if myargs.input.find('b_read_on.txt') != -1:
-        solve_case_b(books_count, days, book_scores_dict, libraries)
+        libraries_solved = solve_case_b(books_count, days, book_scores_dict, libraries)
+    elif myargs.input.find('d_tough_choices.txt'):
+        libraries_solved = solve_case_b(books_count, days, book_scores_dict, libraries)
     else:
-        run_generic_algorithm(books_count, days, book_scores_dict, libraries)
-        run_fake_algorithm(libraries)
+        libraries_solved = run_generic_algorithm(books_count, days, book_scores_dict, libraries)
+        # run_fake_algorithm(libraries)
 
-    print_output('output.txt', libraries)
+    print_output('output.txt', libraries_solved)
 
 
 if __name__ == "__main__":
