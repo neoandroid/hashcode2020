@@ -55,6 +55,21 @@ def read_input(myargs):
     return books_count, days, book_scores_dict, libraries
 
 
+def print_output(output_file_name, scanned_libraries_list):
+    with open(output_file_name, 'w') as f:
+        f.write(output_file_name)
+        for library in scanned_libraries_list:
+            f.write("{} {}".format(library.library_index, library.scanned_books_count))
+            f.write(" ".join(library.scanned_books_list))
+
+
+def update_libraries_fake_algorithm(libraries):
+    libraries[0].scanned_books_count = 5
+    libraries[0].scanned_books_list = [0, 1, 2, 3, 4]
+    libraries[1].scanned_books_count = 2
+    libraries[1].scanned_books_list = [0, 2]
+
+
 def main():
     myargs = parse_args()
     books_count, days, book_scores_dict, libraries = read_input(myargs)
@@ -62,6 +77,10 @@ def main():
     print('Book score dict: {}'.format(book_scores_dict))
     for library in libraries:
         print('Book library: {}'.format(library.__dict__))
+
+    update_libraries_fake_algorithm(libraries)
+
+    print_output('output.txt', libraries)
 
 
 if __name__ == "__main__":
