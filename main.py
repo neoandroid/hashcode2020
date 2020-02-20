@@ -16,7 +16,7 @@ class Library(object):
         self.ship_books_per_day = int(ship_books_per_day)
 
     def __repr__(self):
-        return "<Library: index:%s signup_delay:%s>" % (self.library_index, self.signup_days)
+        return "<Library: index:%s signup_delay:%s num_books:%s>" % (self.library_index, self.signup_days, len(self.books_index_set))
 
 
 def parse_args():
@@ -75,15 +75,42 @@ def run_fake_algorithm(libraries):
 
 def solve_case_b(books_count, days, book_scores_dict, libraries):
     # 100000 books, all socre 100
-    # 100 librares, all ship 1 book
+    # 100 librares, all ship 1 book, distinct delay time
     # 1000 days
     print("Start")
-    sorted_libraries = sorted(libraries, key=lambda x: x.signup_days, reverse=False)
+    how_many_singups = 100
+    sorted_libraries = sorted(libraries, key=lambda x: x.signup_days, reverse=True)
     print(sorted_libraries)
     for library in sorted_libraries:
         print(library.books_index_set)
         library.scanned_books_list = library.books_index_set
     return sorted_libraries
+
+
+def solve_case_d(books_count, days, book_scores_dict, libraries):
+    # 78600 books, all socre 65
+    # 30000 librares, all ship 1 book, all delay 2
+    # 30001 days
+    print("Start")
+    how_many_singups = 100
+    sorted_libraries = sorted(libraries, key=lambda x: x.book_count, reverse=True)
+    print(sorted_libraries)
+    selected_libraries = []
+    scanned_books = []
+    first = True
+    for library in sorted_libraries:
+        if first:
+            library.scanned_books_list = library.books_index_set
+            scanned_books.extend(list(library.books_index_set))
+            selected_libraries.append(library)
+        else:
+            new_books = set(library.books_index_set) - set(scanned_books)
+            library.scanned_books_list = new_books
+            scanned_books.extend(list(new_books))
+            if len(new_books) > 0 :
+                selected_libraries.append(library)
+        first = False
+    return selected_libraries
 
 
 def run_generic_algorithm(books_count, days, book_scores_dict, libraries):
@@ -162,7 +189,7 @@ def main():
         libraries_solved = solve_case_b(books_count, days, book_scores_dict, libraries)
     elif myargs.input.find('d_tough_choices.txt') != -1:
         print("Sample d hack")
-        libraries_solved = solve_case_b(books_count, days, book_scores_dict, libraries)
+        libraries_solved = solve_case_d(books_count, days, book_scores_dict, libraries)
     else:
         print("Generic solution")
         libraries_solved = run_generic_algorithm(books_count, days, book_scores_dict, libraries)
