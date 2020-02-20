@@ -72,6 +72,16 @@ def run_fake_algorithm(libraries):
     libraries[1].scanned_books_list = [0, 2]
 
 
+def solve_case_b(books_count, days, book_scores_dict, libraries):
+    # 100000 books, all socre 100
+    # 100 librares, all ship 1 book
+    # 1000 days
+    print("Start")
+    how_many_singups = 100
+    sorted_libraries = sorted(libraries, key=lambda x: x.signup_days, reverse=False)
+    print(sorted_libraries)
+
+
 def main():
     myargs = parse_args()
     books_count, days, book_scores_dict, libraries = read_input(myargs)
@@ -81,6 +91,10 @@ def main():
         print('Book library: {}'.format(library.__dict__))
 
     run_fake_algorithm(libraries)
+
+    # Task
+    if myargs.input.find('b_read_on.txt') != -1:
+        solve_case_b(books_count, days, book_scores_dict, libraries)
 
     print_output('output.txt', libraries)
 
