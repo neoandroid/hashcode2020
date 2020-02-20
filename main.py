@@ -159,7 +159,8 @@ def find_library_value_and_books(library, days_remaining, already_scanned_books_
 
     my_books_dict = dict()
     for book_index in books_not_scanned:
-        my_books_dict[book_index] = book_scores_dict[book_index]
+        if book_scores_dict[book_index] >= 150:
+            my_books_dict[book_index] = book_scores_dict[book_index]
 
     books_added = 0
     library_value = 0
