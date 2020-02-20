@@ -43,7 +43,7 @@ def read_input(myargs):
             # print("Line: {}".format(line))
             if line == '\n':
                 continue
-            library_index = idx / 2
+            library_index = int(idx / 2)
             if idx % 2 == 0:
                 book_count, signup_days, ship_books_per_day = line.split()
                 library = Library(library_index, book_count, signup_days, ship_books_per_day)
@@ -57,16 +57,15 @@ def read_input(myargs):
 
 def print_output(output_file_name, scanned_libraries_list):
     with open(output_file_name, 'w') as f:
-        f.write(output_file_name)
+        f.write("{}\n".format(len(scanned_libraries_list)))
         for library in scanned_libraries_list:
-            f.write("{} {}".format(library.library_index, library.scanned_books_count))
-            f.write(" ".join(library.scanned_books_list))
+            f.write("{} {}\n".format(library.library_index, len(library.scanned_books_list)))
+            f.write(" ".join(map(str, library.scanned_books_list)))
+            f.write('\n')
 
 
-def update_libraries_fake_algorithm(libraries):
-    libraries[0].scanned_books_count = 5
+def run_fake_algorithm(libraries):
     libraries[0].scanned_books_list = [0, 1, 2, 3, 4]
-    libraries[1].scanned_books_count = 2
     libraries[1].scanned_books_list = [0, 2]
 
 
@@ -78,7 +77,7 @@ def main():
     for library in libraries:
         print('Book library: {}'.format(library.__dict__))
 
-    update_libraries_fake_algorithm(libraries)
+    run_fake_algorithm(libraries)
 
     print_output('output.txt', libraries)
 
