@@ -59,13 +59,23 @@ def read_input(myargs):
     return books_count, days, book_scores_dict, libraries
 
 
-def print_output(output_file_name, scanned_libraries_list):
+def print_output(output_file_name, scanned_libraries_list, book_scores_dict):
     with open(output_file_name, 'w') as f:
+        scanned_books_set = set()
+        total_points = 0
         f.write("{}\n".format(len(scanned_libraries_list)))
         for library in scanned_libraries_list:
+            for book in library.scanned_books_list:
+                assert(book not in scanned_books_set)
+                scanned_books_set.add(book)
+                total_points += book_scores_dict[book]
             f.write("{} {}\n".format(library.library_index, len(library.scanned_books_list)))
             f.write(" ".join(map(str, library.scanned_books_list)))
             f.write('\n')
+
+    print("Total points: {}, Scanned books: {}".format(
+        total_points, len(scanned_books_set)
+    ))
 
 
 def run_fake_algorithm(libraries):
@@ -78,7 +88,6 @@ def solve_case_b(books_count, days, book_scores_dict, libraries):
     # 100 librares, all ship 1 book, distinct delay time
     # 1000 days
     print("Start")
-    how_many_singups = 100
     sorted_libraries = sorted(libraries, key=lambda x: x.signup_days, reverse=True)
     print(sorted_libraries)
     for library in sorted_libraries:
@@ -119,14 +128,23 @@ def run_generic_algorithm(books_count, days, book_scores_dict, libraries):
     output_libraries = list()
     total_score = 0
     while True:
-        print("Remaining days: {}".format(days_remaining))
+        print("Remaining days: {}, Libraries used: {}, Libraries left: {}, Used books: {}/{}".format(
+            days_remaining, len(output_libraries), len(libraries), len(already_scanned_books_set), books_count
+        ))
         for library in libraries:
             max_value, scanned_books_list = find_library_value_and_books(library, days_remaining, already_scanned_books_set, book_scores_dict)
             library.max_value = max_value
             library.scanned_books_list = scanned_books_list
             library.magic_ratio = max_value / library.signup_days
+            # library.magic_ratio = (max_value / library.signup_days) * library.ship_books_per_day
+            # library.magic_ratio = (1 / library.signup_days) * library.ship_books_per_day
 
+        # sort the libraries by magic ratio
         sorted_libraries = sorted(libraries, key=lambda x: x.magic_ratio, reverse=True)
+        # # out of the top-10, pick the one with the least signup days
+        # top_10, rest = sorted_libraries[:10], sorted_libraries[10:]
+        # resorted_top_10 = sorted(top_10, key=lambda x: x.signup_days)
+        # sorted_libraries = resorted_top_10 + rest
 
         # we have chosen a winner, update the values
         winner_library = sorted_libraries.pop(0)
@@ -134,6 +152,11 @@ def run_generic_algorithm(books_count, days, book_scores_dict, libraries):
             print('Got max_value 0')
             # we can't scan anything anymore, bail
             break
+        print("Chose library with: max_value: {}, total_books: {}, signup_days: {}, best book: {}, worst book {}".format(
+            winner_library.max_value, len(winner_library.scanned_books_list), winner_library.signup_days,
+            book_scores_dict[winner_library.scanned_books_list[0]],
+            book_scores_dict[winner_library.scanned_books_list[-1]]
+        ))
         total_score += winner_library.max_value
         days_remaining -= winner_library.signup_days
         winner_library_books_set = set(winner_library.scanned_books_list)
@@ -159,12 +182,15 @@ def find_library_value_and_books(library, days_remaining, already_scanned_books_
 
     my_books_dict = dict()
     for book_index in books_not_scanned:
+        # LAIA's hack!!! It magically works!
+        # if book_scores_dict[book_index] < 100:
+        #    continue
         my_books_dict[book_index] = book_scores_dict[book_index]
 
     books_added = 0
     library_value = 0
     scanned_books_list = list()
-    for k, v in sorted(my_books_dict.items(), key=lambda item: item[1]):
+    for k, v in sorted(my_books_dict.items(), key=lambda item: item[1], reverse=True):
         library_value += v
         scanned_books_list.append(k)
         books_added += 1
@@ -179,9 +205,6 @@ def main():
     books_count, days, book_scores_dict, libraries = read_input(myargs)
     print('Books: {}, Days: {}'.format(books_count, days))
     # print('Book score dict: {}'.format(book_scores_dict))
-    for library in libraries:
-        pass
-        # print('Book library: {}'.format(library.__dict__))
 
     # Task
     if myargs.input.find('b_read_on.txt') != -1:
@@ -189,13 +212,13 @@ def main():
         libraries_solved = solve_case_b(books_count, days, book_scores_dict, libraries)
     elif myargs.input.find('d_tough_choices.txt') != -1:
         print("Sample d hack")
-        libraries_solved = solve_case_d(books_count, days, book_scores_dict, libraries)
+        libraries_solved = run_generic_algorithm(books_count, days, book_scores_dict, libraries)
     else:
         print("Generic solution")
         libraries_solved = run_generic_algorithm(books_count, days, book_scores_dict, libraries)
         # run_fake_algorithm(libraries)
 
-    print_output('output.txt', libraries_solved)
+    print_output('output.txt', libraries_solved, book_scores_dict)
 
 
 if __name__ == "__main__":
