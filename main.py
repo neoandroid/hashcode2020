@@ -99,9 +99,9 @@ def solve_case_b(books_count, days, book_scores_dict, libraries):
 
 
 def solve_case_c(books_count, days, book_scores_dict, libraries):
-    # 100000 books, all socre 100
-    # 100 librares, all ship 1 book, distinct delay time
-    # 1000 days
+    # 100000 books, distinct scores
+    # 10000 librares, can ship lots of books, but they have very few
+    # 100000 days
     print("Start")
     how_many_singups = 100
     sorted_libraries = sorted(libraries, key=lambda x: x.signup_days, reverse=False)
