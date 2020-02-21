@@ -22,7 +22,9 @@ class Library(object):
 def parse_args():
     parser = argparse.ArgumentParser(description='')
     parser.add_argument('--input', required=True, help='Input file')
+    parser.add_argument('--no-generic', dest='avoid_generic_alg', required=False, action='store_true', help='Do not run generic algorithm')
     # parser.add_argument('--output', required=True, help='Output file')
+    parser.set_defaults(avoid_generic_alg=False)
     return parser.parse_args()
 
 
@@ -96,6 +98,32 @@ def solve_case_b(books_count, days, book_scores_dict, libraries):
     return sorted_libraries
 
 
+def solve_case_c(books_count, days, book_scores_dict, libraries):
+    # 100000 books, all socre 100
+    # 100 librares, all ship 1 book, distinct delay time
+    # 1000 days
+    print("Start")
+    how_many_singups = 100
+    sorted_libraries = sorted(libraries, key=lambda x: x.signup_days, reverse=True)
+    print(sorted_libraries)
+    selected_libraries = []
+    scanned_books = []
+    first = True
+    for library in sorted_libraries:
+        if first:
+            library.scanned_books_list = library.books_index_set
+            scanned_books.extend(order_libray_books_by_points(library.books_index_set, book_scores_dict))
+            selected_libraries.append(library)
+        else:
+            new_books = set(order_libray_books_by_points(library.books_index_set, book_scores_dict)) - set(scanned_books)
+            library.scanned_books_list = new_books
+            scanned_books.extend(list(new_books))
+            if len(new_books) > 0 :
+                selected_libraries.append(library)
+        first = False
+    return selected_libraries
+
+
 def solve_case_d(books_count, days, book_scores_dict, libraries):
     # 78600 books, all socre 65
     # 30000 librares, all ship 1 book, all delay 2
@@ -120,6 +148,18 @@ def solve_case_d(books_count, days, book_scores_dict, libraries):
                 selected_libraries.append(library)
         first = False
     return selected_libraries
+
+
+def order_libray_books_by_points(books_set, books_scores_dict):
+    my_books_dict = dict()
+    for book_index in books_set:
+        my_books_dict[book_index] = books_scores_dict[book_index]
+
+    scanned_books_list = list()
+    for k, v in sorted(my_books_dict.items(), key=lambda item: item[1]):
+        scanned_books_list.append(k)
+
+    return scanned_books_list
 
 
 def run_generic_algorithm(books_count, days, book_scores_dict, libraries):
@@ -205,12 +245,18 @@ def main():
     # print('Book score dict: {}'.format(book_scores_dict))
 
     # Task
-    if myargs.input.find('b_read_on.txt') != -1:
+    if myargs.input.find('b_read_on.txt') != -1 and myargs.avoid_generic_alg == True:
         print("Sample b hack")
         libraries_solved = solve_case_b(books_count, days, book_scores_dict, libraries)
-    elif myargs.input.find('d_tough_choices.txt') != -1:
+    elif myargs.input.find('c_incunabula.txt') != -1 and myargs.avoid_generic_alg == True:
+        print("Sample c hack")
+        libraries_solved = solve_case_c(books_count, days, book_scores_dict, libraries)
+    elif myargs.input.find('d_tough_choices.txt') != -1 and myargs.avoid_generic_alg == True:
         print("Sample d hack")
-        libraries_solved = run_generic_algorithm(books_count, days, book_scores_dict, libraries)
+        libraries_solved = solve_case_d(books_count, days, book_scores_dict, libraries)
+    elif myargs.input.find('e_so_many_books.txt') != -1 and myargs.avoid_generic_alg == True:
+        print("Sample e hack")
+        libraries_solved = solve_case_c(books_count, days, book_scores_dict, libraries)
     else:
         print("Generic solution")
         libraries_solved = run_generic_algorithm(books_count, days, book_scores_dict, libraries)
