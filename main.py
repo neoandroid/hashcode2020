@@ -90,7 +90,7 @@ def solve_case_b(books_count, days, book_scores_dict, libraries):
     # 100 librares, all ship 1 book, distinct delay time
     # 1000 days
     print("Start")
-    sorted_libraries = sorted(libraries, key=lambda x: x.signup_days, reverse=True)
+    sorted_libraries = sorted(libraries, key=lambda x: x.signup_days, reverse=False)
     print(sorted_libraries)
     for library in sorted_libraries:
         print(library.books_index_set)
@@ -104,7 +104,7 @@ def solve_case_c(books_count, days, book_scores_dict, libraries):
     # 1000 days
     print("Start")
     how_many_singups = 100
-    sorted_libraries = sorted(libraries, key=lambda x: x.signup_days, reverse=True)
+    sorted_libraries = sorted(libraries, key=lambda x: x.signup_days, reverse=False)
     print(sorted_libraries)
     selected_libraries = []
     scanned_books = []
@@ -156,7 +156,7 @@ def order_libray_books_by_points(books_set, books_scores_dict):
         my_books_dict[book_index] = books_scores_dict[book_index]
 
     scanned_books_list = list()
-    for k, v in sorted(my_books_dict.items(), key=lambda item: item[1]):
+    for k, v in sorted(my_books_dict.items(), key=lambda item: item[1], reverse=True):
         scanned_books_list.append(k)
 
     return scanned_books_list
