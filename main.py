@@ -15,6 +15,7 @@ class Library(object):
         self.signup_days = int(signup_days)
         self.ship_books_per_day = int(ship_books_per_day)
 
+
     def __repr__(self):
         return "<Library: index:%s signup_delay:%s num_books:%s>" % (self.library_index, self.signup_days, len(self.books_index_set))
 
@@ -103,7 +104,6 @@ def solve_case_c(books_count, days, book_scores_dict, libraries):
     # 10000 librares, can ship lots of books, but they have very few
     # 100000 days
     print("Start")
-    how_many_singups = 100
     sorted_libraries = sorted(libraries, key=lambda x: x.signup_days, reverse=False)
     print(sorted_libraries)
     selected_libraries = []
@@ -129,7 +129,6 @@ def solve_case_d(books_count, days, book_scores_dict, libraries):
     # 30000 librares, all ship 1 book, all delay 2
     # 30001 days
     print("Start")
-    how_many_singups = 100
     sorted_libraries = sorted(libraries, key=lambda x: x.book_count, reverse=True)
     print(sorted_libraries)
     selected_libraries = []
@@ -148,6 +147,47 @@ def solve_case_d(books_count, days, book_scores_dict, libraries):
                 selected_libraries.append(library)
         first = False
     return selected_libraries
+
+
+def solve_case_d_alg2(books_count, days, book_scores_dict, libraries):
+    # 78600 books, all socre 65
+    # 30000 librares, all ship 1 book, all delay 2
+    # 30001 days
+    print("Start")
+    sorted_libraries = sorted(libraries, key=lambda x: x.book_count, reverse=True)
+    print(sorted_libraries)
+    selected_libraries = []
+    scanned_books = []
+    sorted_libraries[0].scanned_books_list = list(sorted_libraries[0].books_index_set)
+    scanned_books.extend(list(sorted_libraries[0].books_index_set))
+    selected_libraries.append(sorted_libraries[0])
+    sorted_libraries.pop(0)
+    remaining_libraries = sorted_libraries
+    while len(selected_libraries) < 15001:
+        # Remove_scanned_books
+        remaining_libraries = remove_scanned_books(remaining_libraries, scanned_books)
+        # Sort remaining libraries with the ones that have more books to scan
+        sorted_remaining_libraries = sorted(remaining_libraries, key=lambda x: x.book_count, reverse=True)
+        sorted_remaining_libraries[0].scanned_books_list = list(sorted_remaining_libraries[0].books_index_set)
+        scanned_books.extend(sorted_remaining_libraries[0].scanned_books_list)
+        selected_libraries.append(sorted_remaining_libraries[0])
+        sorted_remaining_libraries.pop(0)
+        remaining_libraries = sorted_remaining_libraries
+        print(len(selected_libraries))
+
+    return selected_libraries
+
+
+def remove_scanned_books(libraries, scanned_books):
+    good_libraries = []
+    scanned_books_set = set(scanned_books)
+    for library in libraries:
+        books_not_scanned = library.books_index_set - scanned_books_set
+        library.books_index_set = books_not_scanned
+        library.book_count = len(library.books_index_set)
+        if len(library.books_index_set) > 0:
+            good_libraries.append(library)
+    return good_libraries
 
 
 def order_libray_books_by_points(books_set, books_scores_dict):
@@ -253,7 +293,7 @@ def main():
         libraries_solved = solve_case_c(books_count, days, book_scores_dict, libraries)
     elif myargs.input.find('d_tough_choices.txt') != -1 and myargs.avoid_generic_alg == True:
         print("Sample d hack")
-        libraries_solved = solve_case_d(books_count, days, book_scores_dict, libraries)
+        libraries_solved = solve_case_d_alg2(books_count, days, book_scores_dict, libraries)
     elif myargs.input.find('e_so_many_books.txt') != -1 and myargs.avoid_generic_alg == True:
         print("Sample e hack")
         libraries_solved = solve_case_c(books_count, days, book_scores_dict, libraries)
